@@ -1,0 +1,56 @@
+import os
+import pandas as pd
+
+
+
+# 要合并的excel的目录
+rootdir = 'D:\IDEA_Data\LinuxTest_T_240_result_V1\_user1600_edgeNode3009_avgCost100.0_computingRatio0.1'
+
+# 要写入的excel全路径及名称
+file_to = rootdir+'\mergeResult.csv'
+
+
+
+# 获取文件夹下所有的目录与文件
+def list_all_files(rootdir):
+    _files = []
+    list = os.listdir(rootdir)
+    for i in range(0, len(list)):
+        path = os.path.join(rootdir, list[i])
+        if os.path.isdir(path):
+            _files.extend(list_all_files(path))
+        if os.path.isfile(path):
+            _files.append(path)
+    return _files
+
+
+
+
+def merge_files(file_list, file_to):
+    frames=pd.DataFrame()
+    for i in file_list:
+
+        temp=i.split('\\')[-1][0:-4]
+
+        df = pd.read_csv(i,usecols=['impact'])
+
+        df = df.rename(columns={'impact': temp})
+
+        d=pd.DataFrame(df)
+
+        frames=pd.concat([frames,d],axis=1)
+
+
+    # 合并所有数据
+    frames.to_csv(file_to,index=True,header=True)
+
+
+
+if os.path.exists(file_to):
+    os.remove(file_to)
+merge_files(list_all_files(rootdir),file_to)
+
+
+
+
+
